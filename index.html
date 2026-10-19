@@ -1,0 +1,384 @@
+```html
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screenplay Studio</title>
+<style>
+:root {
+  --bg:#080d18;
+  --panel:#111d30;
+  --panel2:#17263d;
+  --line:#2c405c;
+  --text:#edf4ff;
+  --muted:#91a5c3;
+  --accent:#55dcff;
+  --green:#78e0b0;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:radial-gradient(ellipse at top,#172944,var(--bg) 65%);
+  color:var(--text);
+  font-family:Arial,Tahoma,sans-serif;
+  min-height:100vh;
+}
+button,input,select,textarea { font:inherit; }
+button {
+  cursor:pointer;
+  padding:11px 15px;
+  color:var(--text);
+  background:linear-gradient(180deg,#263b57,#15243a);
+  border:1px solid #405774;
+  border-radius:11px;
+  box-shadow:0 4px 0 #050913,0 8px 16px #0003;
+  transition:.15s;
+}
+button:hover {
+  border-color:var(--accent);
+  box-shadow:0 0 16px #55dcff24,0 4px 0 #050913;
+}
+button:active { transform:translateY(2px); }
+.primary {
+  background:linear-gradient(180deg,#17617a,#124057);
+  border-color:#42b9d9;
+}
+.topbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:16px;
+  padding:20px 25px;
+  border-bottom:1px solid var(--line);
+  background:#09111fee;
+}
+.brand { display:flex;align-items:center;gap:13px; }
+.logo {
+  width:45px;height:45px;
+  display:grid;place-items:center;
+  border-radius:14px;
+  color:var(--accent);
+  font-size:24px;
+  border:1px solid #42617e;
+  background:linear-gradient(145deg,#243e5a,#0b1728);
+  box-shadow:inset 0 1px #ffffff18,0 0 20px #55dcff12;
+}
+h1 { margin:0;font-size:18px;letter-spacing:1.5px; }
+.brand small {
+  display:block;margin-top:5px;
+  color:var(--muted);font-size:10px;letter-spacing:2px;
+}
+.actions { display:flex;align-items:center;gap:10px;flex-wrap:wrap; }
+#saveStatus { color:var(--green);font-size:12px; }
+.layout {
+  max-width:1450px;
+  margin:25px auto;
+  padding:0 20px;
+  display:grid;
+  grid-template-columns:220px minmax(0,1fr);
+  gap:20px;
+}
+.sidebar,.panel {
+  border:1px solid var(--line);
+  border-radius:17px;
+  background:linear-gradient(150deg,#142239f2,#0c1525f5);
+  box-shadow:0 16px 40px #0002;
+}
+.sidebar { padding:15px;height:max-content; }
+.label {
+  color:#8297b7;font-size:10px;
+  letter-spacing:1.5px;margin:10px 8px 13px;
+}
+.nav {
+  width:100%;display:flex;align-items:center;gap:10px;
+  text-align:left;margin-bottom:8px;
+  background:transparent;border-color:transparent;box-shadow:none;
+}
+.nav.active { background:#193149;border-color:#37647c;color:var(--accent); }
+.nav span { width:22px;text-align:center;font-size:17px; }
+.side-note {
+  margin-top:20px;padding:13px;
+  border:1px solid var(--line);border-radius:12px;
+  color:var(--muted);font-size:12px;line-height:1.8;
+  background:#0a1423;
+}
+h2 { margin:7px 0;font-size:25px; }
+.eyebrow { color:var(--accent);font-size:10px;letter-spacing:2px; }
+.subtitle { color:var(--muted);font-size:13px; }
+.pagehead {
+  display:flex;justify-content:space-between;align-items:center;
+  gap:12px;margin:2px 0 17px;flex-wrap:wrap;
+}
+.panel { overflow:hidden; }
+.titleRow {
+  display:flex;gap:12px;padding:16px;
+  border-bottom:1px solid var(--line);
+}
+input,select {
+  min-width:0;width:100%;
+  background:#0a1423;color:var(--text);
+  border:1px solid var(--line);border-radius:9px;
+  padding:12px;outline:none;
+}
+input:focus,select:focus { border-color:var(--accent); }
+.toolbar {
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+  padding:12px 16px;border-bottom:1px solid var(--line);
+}
+.toolbar button { font-size:12px;padding:9px 12px; }
+#editor {
+  display:block;width:100%;min-height:510px;
+  padding:35px clamp(20px,6vw,75px);
+  border:0;outline:none;resize:vertical;
+  color:#edf4ff;background:transparent;
+  font:16px/1.9 "Courier New",monospace;
+  white-space:pre-wrap;
+}
+#editor::placeholder { color:#657c9c; }
+.statusbar {
+  display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  padding:12px 17px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:11px;
+}
+.quick { margin-top:17px;padding:17px; }
+.quickHead { display:flex;justify-content:space-between;align-items:center;margin-bottom:13px; }
+.quickHead h3 { margin:0;font-size:14px; }
+.tag { font-size:10px;color:var(--accent);border:1px solid #31566c;padding:5px 9px;border-radius:20px; }
+.quickGrid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px; }
+.quickGrid button { text-align:left;min-height:65px;font-size:12px; }
+.quickGrid span { display:block;font-size:18px;color:var(--accent);margin-bottom:6px; }
+footer {
+  max-width:1450px;margin:0 auto;padding:0 22px 25px;
+  display:flex;justify-content:space-between;gap:12px;
+  color:#687e9e;font-size:11px;
+}
+@media(max-width:850px) {
+  .layout { grid-template-columns:1fr;padding:0 12px; }
+  .sidebar { display:grid;grid-template-columns:1fr 1fr;gap:5px; }
+  .label,.side-note { grid-column:1/-1; }
+  .nav { margin:0; }
+  .quickGrid { grid-template-columns:1fr 1fr; }
+}
+@media(max-width:520px) {
+  .topbar { padding:15px; }
+  .layout { margin-top:14px; }
+  .titleRow { flex-direction:column; }
+  #editor { min-height:430px;padding:22px 15px; }
+  footer { padding:0 14px 20px;flex-direction:column; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">✦</div>
+    <div>
+      <h1>SCREENPLAY STUDIO</h1>
+      <small>YOUR STORY. YOUR VISION.</small>
+    </div>
+  </div>
+  <div class="actions">
+    <span id="saveStatus">● آماده</span>
+    <button onclick="saveDraft()">ذخیره</button>
+    <button class="primary" onclick="exportText()">خروجی TXT ↗</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="label">WORKSPACE</div>
+    <button class="nav active" onclick="changePanel(this,'script')"><span>✎</span> فیلمنامه</button>
+    <button class="nav" onclick="changePanel(this,'notes')"><span>▤</span> یادداشت‌ها</button>
+    <button class="nav" onclick="changePanel(this,'scenes')"><span>▦</span> تابلوی صحنه‌ها</button>
+
+    <div class="label" style="margin-top:22px">WRITING TOOLS</div>
+    <button class="nav" onclick="insertText('INT. LOCATION - NIGHT\n\n')"><span>⌁</span> سرصحنه</button>
+    <button class="nav" onclick="insertText('\n                    CHARACTER NAME\n')"><span>♙</span> نام شخصیت</button>
+    <button class="nav" onclick="insertText('\nCUT TO:\n\n')"><span>➜</span> کات به</button>
+
+    <div class="side-note">
+      فضای اختصاصی نوشتن فیلمنامه.<br>
+      متن خودت را بنویس، ذخیره کن و هر زمان خواستی خروجی بگیر.
+    </div>
+  </aside>
+
+  <main>
+    <div class="pagehead">
+      <div>
+        <div class="eyebrow">WRITER WORKSPACE / 01</div>
+        <h2 id="pageTitle">فیلمنامه</h2>
+        <div class="subtitle" id="pageSubtitle">فضایی آرام برای خلق صحنهٔ بعدی.</div>
+      </div>
+      <button onclick="newDraft()">＋ متن جدید</button>
+    </div>
+
+    <section class="panel">
+      <div class="titleRow">
+        <input id="scriptTitle" value="فیلمنامهٔ بدون عنوان" placeholder="عنوان فیلمنامه">
+        <select id="direction" onchange="setDirection(this.value)">
+          <option value="rtl">فارسی · راست‌چین</option>
+          <option value="ltr">English · Left to right</option>
+        </select>
+      </div>
+
+      <div class="toolbar">
+        <button onclick="changeFont(1)">A+</button>
+        <button onclick="changeFont(-1)">A−</button>
+        <button onclick="insertText('FADE IN:\n\n')">FADE IN</button>
+        <button onclick="insertText('INT. LOCATION - NIGHT\n\n')">INT./EXT.</button>
+        <button onclick="insertText('\n                    CHARACTER NAME\n')">CHARACTER</button>
+        <button onclick="insertText('\nCUT TO:\n\n')">CUT TO:</button>
+        <button onclick="setDirection('rtl')">RTL</button>
+        <button onclick="setDirection('ltr')">LTR</button>
+      </div>
+
+      <textarea id="editor" dir="rtl" placeholder="شروع تصویر:
+
+داخلی. مکان - شب
+
+داستانت را از اینجا شروع کن..."></textarea>
+
+      <div class="statusbar">
+        <span id="counts">۰ کلمه · ۰ نویسه</span>
+        <span>ذخیرهٔ محلی در مرورگر</span>
+      </div>
+    </section>
+
+    <section class="panel quick" id="quickTools">
+      <div class="quickHead">
+        <h3>ابزارهای سریع</h3>
+        <span class="tag">QUICK INSERT</span>
+      </div>
+      <div class="quickGrid">
+        <button onclick="insertText('FADE IN:\n\n')"><span>◉</span>FADE IN</button>
+        <button onclick="insertText('INT. LOCATION - NIGHT\n\n')"><span>⌁</span>سرصحنه</button>
+        <button onclick="insertText('\n                    CHARACTER NAME\n')"><span>♙</span>شخصیت</button>
+        <button onclick="insertText('\nCUT TO:\n\n')"><span>➜</span>کات به</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <span>SCREENPLAY STUDIO · FIRST BUILD</span>
+  <span>Write boldly. Direct with purpose.</span>
+</footer>
+
+<script>
+const editor = document.getElementById('editor');
+const titleInput = document.getElementById('scriptTitle');
+const saveStatus = document.getElementById('saveStatus');
+let fontSize = 16;
+
+function updateCounts() {
+  const value = editor.value.trim();
+  const words = value ? value.split(/\s+/).length : 0;
+  document.getElementById('counts').textContent =
+    words + ' کلمه · ' + editor.value.length + ' نویسه';
+}
+
+function markUnsaved() {
+  saveStatus.textContent = '● تغییرات ذخیره‌نشده';
+  saveStatus.style.color = '#ffd479';
+}
+
+editor.addEventListener('input', () => {
+  updateCounts();
+  markUnsaved();
+});
+titleInput.addEventListener('input', markUnsaved);
+
+function saveDraft() {
+  try {
+    localStorage.setItem('screenplay-studio-text', editor.value);
+    localStorage.setItem('screenplay-studio-title', titleInput.value);
+    saveStatus.textContent = '● ذخیره شد';
+    saveStatus.style.color = '#78e0b0';
+  } catch (error) {
+    saveStatus.textContent = 'ذخیرهٔ مرورگر در دسترس نیست';
+  }
+  updateCounts();
+}
+
+function insertText(text) {
+  const start = editor.selectionStart;
+  const end = editor.selectionEnd;
+  editor.setRangeText(text, start, end, 'end');
+  editor.focus();
+  updateCounts();
+  markUnsaved();
+}
+
+function changeFont(amount) {
+  fontSize = Math.max(11, Math.min(32, fontSize + amount));
+  editor.style.fontSize = fontSize + 'px';
+  editor.focus();
+}
+
+function setDirection(dir) {
+  editor.dir = dir;
+  editor.style.textAlign = dir === 'rtl' ? 'right' : 'left';
+  document.getElementById('direction').value = dir;
+}
+
+function exportText() {
+  const text = titleInput.value + '\n\n' + editor.value;
+  const blob = new Blob(['\ufeff', text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = (titleInput.value.trim() || 'screenplay') + '.txt';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function newDraft() {
+  if (editor.value.trim() &&
+      !confirm('متن فعلی را خروجی بگیر یا ذخیره کن. متن جدید ساخته شود؟')) return;
+  editor.value = '';
+  titleInput.value = 'فیلمنامهٔ بدون عنوان';
+  updateCounts();
+  markUnsaved();
+  editor.focus();
+}
+
+function changePanel(button, panel) {
+  document.querySelectorAll('.nav').forEach(item => item.classList.remove('active'));
+  button.classList.add('active');
+
+  const pageTitle = document.getElementById('pageTitle');
+  const pageSubtitle = document.getElementById('pageSubtitle');
+
+  if (panel === 'script') {
+    pageTitle.textContent = 'فیلمنامه';
+    pageSubtitle.textContent = 'فضایی آرام برای خلق صحنهٔ بعدی.';
+    editor.placeholder = 'شروع تصویر:\n\nداخلی. مکان - شب\n\nداستانت را از اینجا شروع کن...';
+    document.getElementById('quickTools').style.display = 'block';
+  } else if (panel === 'notes') {
+    pageTitle.textContent = 'یادداشت‌ها';
+    pageSubtitle.textContent = 'ایده‌ها و نکته‌های داستانی‌ات را ثبت کن.';
+    editor.placeholder = 'یادداشت‌هایت را اینجا بنویس...';
+    document.getElementById('quickTools').style.display = 'none';
+  } else {
+    pageTitle.textContent = 'تابلوی صحنه‌ها';
+    pageSubtitle.textContent = 'طرح صحنه‌ها را به‌صورت متنی مرتب کن.';
+    editor.placeholder = 'صحنه ۱\nهدف:\nتعارض:\nتغییر:\n\nصحنه ۲\n...';
+    document.getElementById('quickTools').style.display = 'block';
+  }
+}
+
+try {
+  editor.value = localStorage.getItem('screenplay-studio-text') || '';
+  titleInput.value = localStorage.getItem('screenplay-studio-title') || 'فیلمنامهٔ بدون عنوان';
+} catch (error) {}
+
+updateCounts();
+</script>
+</body>
+</html>
+```
